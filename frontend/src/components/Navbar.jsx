@@ -1,11 +1,28 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import Button from "./Button";
+import databaseServices from "../services/DatabaseServices.js";
+import { logout } from "../redux/authSlice.js";
 
 const Navbar = () => {
+  const status = useSelector((state) => state.auth.status);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const userLogout = () => {
+    databaseServices.logout().then((isLogout) => {
+      if (isLogout) {
+        dispatch(logout());
+        navigate("/login");
+      }
+    });
+  };
+
   const navLinks = [
-    { name: "Home", path: "/", status: true },
-    { name: "Login", path: "/login", status: true },
-    { name: "Signup", path: "/signup", status: true },
+    { name: "Home", path: "/", status },
+    { name: "Login", path: "/login", status: !status },
+    { name: "Signup", path: "/signup", status: !status },
   ];
 
   return (
@@ -15,7 +32,7 @@ const Navbar = () => {
           <span className="text-2xl font-bold">LOGO</span>
         </div>
 
-        <div className="flex gap-15">
+        <div className="flex items-center gap-15">
           {navLinks.map(
             (link) =>
               link.status && (
@@ -28,6 +45,7 @@ const Navbar = () => {
                 </Link>
               )
           )}
+          {status && <Button onClick={userLogout} heading="Logout" />}
         </div>
       </div>
     </div>

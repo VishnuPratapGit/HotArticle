@@ -2,17 +2,11 @@ import { db } from "../db/drizzle";
 import { usersTable } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { hash, compare } from "bcryptjs";
-import { decode, sign, verify } from "hono/jwt";
+import { sign } from "hono/jwt";
 import { z } from "zod";
 import { Context } from "hono";
 import dotenv from "dotenv";
-import {
-  getCookie,
-  getSignedCookie,
-  setCookie,
-  setSignedCookie,
-  deleteCookie,
-} from "hono/cookie";
+import { setCookie, deleteCookie } from "hono/cookie";
 
 dotenv.config();
 
@@ -49,11 +43,12 @@ const userSignup = async (c: Context) => {
       name: z.string().min(1, "Name is required"),
       email: z.string().email("Invalid email"),
       password: z.string().min(4, "Password must be at least 4 characters"),
+      categories: z
+        .array(z.string())
+        .nonempty("At least one category is required"),
     });
 
-    const formData = await c.req.formData();
-
-    const body = Object.fromEntries(formData);
+    const body = await c.req.json();
 
     const parsedData = signupSchema.safeParse(body);
 
@@ -61,7 +56,7 @@ const userSignup = async (c: Context) => {
       return c.json({ error: parsedData.error.format() }, 400);
     }
 
-    const { name, email, password } = parsedData.data;
+    const { name, email, password, categories } = parsedData.data;
 
     const existingUser = await db
       .select()
@@ -76,7 +71,7 @@ const userSignup = async (c: Context) => {
 
     const [newUser] = await db
       .insert(usersTable)
-      .values({ name, email, password: hashedPassword })
+      .values({ name, email, password: hashedPassword, categories })
       .returning();
 
     return c.json(
@@ -96,9 +91,7 @@ const userLogin = async (c: Context) => {
       password: z.string().min(1, "Password is required"),
     });
 
-    const formData = await c.req.formData();
-
-    const body = Object.fromEntries(formData);
+    const body = await c.req.json();
 
     const parsedData = loginSchema.safeParse(body);
 
@@ -181,4 +174,32 @@ const userLogout = async (c: Context) => {
   }
 };
 
-export { userSignup, userLogin, userLogout };
+const getCurrentUser = async (c: Context) => {
+  try {
+    const user = c.get("user");
+
+    if (!user || !user.id) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const [newuser] = await db
+      .select({
+        id: usersTable.id,
+        name: usersTable.name,
+        email: usersTable.email,
+      })
+      .from(usersTable)
+      .where(eq(usersTable.email, user.email));
+
+    if (!newuser) {
+      return c.json({ error: "user not found" }, 404);
+    }
+
+    return c.json({ ...newuser }, 200);
+  } catch (error) {
+    console.log(error);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
+export { userSignup, userLogin, userLogout, getCurrentUser };

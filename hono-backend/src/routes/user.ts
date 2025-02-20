@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import {
+  getCurrentUser,
   userLogin,
   userLogout,
   userSignup,
@@ -11,5 +12,6 @@ const userRoutes = new Hono();
 userRoutes.post("/signup", userSignup);
 userRoutes.post("/login", userLogin);
 userRoutes.get("/logout", authMiddleware, userLogout);
+userRoutes.get("/getuser", authMiddleware, getCurrentUser);
 
 export { userRoutes };

@@ -5,6 +5,7 @@ import { Home, Signup, Login } from "./pages";
 import store from "./redux/store.js";
 import App from "./App.jsx";
 import "./index.css";
+import { AuthWrapper } from "./components";
 
 const router = createBrowserRouter([
   {
@@ -13,15 +14,27 @@ const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <Home />,
+        element: (
+          <AuthWrapper>
+            <Home />
+          </AuthWrapper>
+        ),
       },
       {
         path: "signup",
-        element: <Signup />,
+        element: (
+          <AuthWrapper authenticate={false}>
+            <Signup />
+          </AuthWrapper>
+        ),
       },
       {
         path: "login",
-        element: <Login />,
+        element: (
+          <AuthWrapper authenticate={false}>
+            <Login />
+          </AuthWrapper>
+        ),
       },
     ],
   },

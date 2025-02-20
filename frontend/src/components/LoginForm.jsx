@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input, Button } from "./index.js";
+import databaseServices from "../services/DatabaseServices.js";
+import { useDispatch } from "react-redux";
+import { login, logout } from "../redux/authSlice.js";
 
 const LoginForm = ({}) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const changeInputs = (e) => {
     const value = e.target.value;
@@ -17,10 +23,23 @@ const LoginForm = ({}) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Submitted:", formData);
+    const isLogin = await databaseServices.login(formData);
+
+    if (!isLogin) {
+      alert("login failed");
+      return;
+    }
+
+    const loggedUser = await databaseServices.getCurrentUser();
+
+    if (loggedUser) {
+      dispatch(login(loggedUser));
+    } else {
+      dispatch(logout());
+    }
 
     setFormData({
       email: "",

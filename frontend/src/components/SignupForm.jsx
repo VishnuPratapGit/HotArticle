@@ -1,9 +1,14 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input, Button } from "./index.js";
 import MultiCategorySelector from "./MultiCategorySelector.jsx";
+import databaseServices from "../services/DatabaseServices.js";
+import { login, logout } from "../redux/authSlice.js";
+import { useDispatch } from "react-redux";
 
 const SignupForm = ({}) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -14,7 +19,6 @@ const SignupForm = ({}) => {
 
   const changeInputs = (e) => {
     const value = e.target.value;
-
     setFormData({
       ...formData,
       [e.target.name]: value,
@@ -22,24 +26,40 @@ const SignupForm = ({}) => {
   };
 
   const nextStep = () => {
-    if (!formData.name || !formData.email || !formData.password) {
-      return;
-    }
+    if (!formData.name || !formData.email || !formData.password) return;
     setStep(step + 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const finalUserData = { ...formData, selectedCategory };
+    const finalUserData = { ...formData, categories: selectedCategory };
 
-    console.log("Submitted:", finalUserData);
+    const isSignup = await databaseServices.signup(finalUserData);
+    if (!isSignup) {
+      alert("Registration failed!");
+      return;
+    }
 
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-    });
+    alert("User registration successful");
+
+    const { email, password } = formData;
+
+    const isLogin = await databaseServices.login({ email, password });
+    if (!isLogin) {
+      alert("Login failed. Redirecting to login page.");
+      return navigate("/login");
+    }
+
+    const loggedUser = await databaseServices.getCurrentUser();
+
+    if (loggedUser) {
+      dispatch(login(loggedUser));
+    } else {
+      dispatch(logout());
+    }
+
+    setFormData({ name: "", email: "", password: "" });
   };
 
   return (
@@ -88,7 +108,7 @@ const SignupForm = ({}) => {
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
             />
-            <Button type="submit" />
+            {selectedCategory.length > 0 && <Button type="submit" />}
           </>
         )}
 
