@@ -135,13 +135,13 @@ const userLogin = async (c: Context) => {
 
     setCookie(c, "accessToken", tokens.accessToken, {
       path: "/",
-      secure: false,
+      secure: true,
       httpOnly: true,
     });
 
     setCookie(c, "refreshToken", tokens.refreshToken, {
       path: "/",
-      secure: false,
+      secure: true,
       httpOnly: true,
     });
 
