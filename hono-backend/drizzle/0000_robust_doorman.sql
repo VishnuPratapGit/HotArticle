@@ -27,17 +27,3 @@ CREATE TABLE "users" (
 );
 --> statement-breakpoint
 ALTER TABLE "articles" ADD CONSTRAINT "articles_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE cascade ON UPDATE no action;
-
--- Insert predefined categories
-INSERT INTO "categories" (name) VALUES 
-    ('Gaming'),
-    ('Sports'),
-    ('Technology'),
-    ('Health'),
-    ('Finance'),
-    ('Education'),
-    ('Entertainment'),
-    ('Science'),
-    ('Politics'),
-    ('Business')
-ON CONFLICT (name) DO NOTHING;

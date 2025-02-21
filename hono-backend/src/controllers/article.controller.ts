@@ -47,25 +47,69 @@ const fetchArticles = async (c: Context) => {
   }
 };
 
+const multipleCategory = z.array(
+  z
+    .string()
+    .toLowerCase()
+    .refine((s) => !s.includes(" "), "No Spaces!")
+);
+
+const categorySchema = z
+  .string()
+  .min(1, "category required")
+  .toLowerCase()
+  .refine((s) => !s.includes(" "), "Don't Include Spaces!");
+
+const multipleCategories = async (c: Context) => {
+  try {
+    const categoriesArr: string[] = await c.req.json();
+    const parsedArrData = multipleCategory.safeParse(categoriesArr);
+    if (!parsedArrData.success) {
+      return c.json({ error: parsedArrData.error.format() }, 400);
+    }
+
+    const newData = parsedArrData.data.map((category: string) => ({
+      name: category,
+    }));
+
+    const insertedRows = await db
+      .insert(categories)
+      .values(newData)
+      .onConflictDoNothing()
+      .returning();
+
+    return c.json(insertedRows, 200);
+  } catch (error) {
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
 const manageCategories = async (c: Context) => {
   try {
     const category = await c.req.text();
+    const parsedCategory = categorySchema.safeParse(category);
+    if (!parsedCategory.success) {
+      return c.json({ error: parsedCategory.error.format() }, 400);
+    }
 
-    const categorySchema = z.string().min(1, "category required");
-    const parsedData = categorySchema.safeParse(category);
-    if (!parsedData.success) {
-      return c.json({ error: parsedData.error.format() }, 400);
+    const checkPresence = await db
+      .select()
+      .from(categories)
+      .where(eq(categories.name, parsedCategory.data));
+
+    if (checkPresence.length > 0) {
+      return c.json({ error: "Category already exists" }, 409);
     }
 
     const newCategory = await db
       .insert(categories)
-      .values({ name: parsedData.data })
+      .values({ name: parsedCategory.data })
       .returning();
 
     return c.json(newCategory, 200);
   } catch (error) {
-    return c.json({ error: "internal server error" }, 500);
+    return c.json({ error: "Internal server error" }, 500);
   }
 };
 
-export { fetchArticles, manageCategories };
+export { fetchArticles, manageCategories, multipleCategories };
