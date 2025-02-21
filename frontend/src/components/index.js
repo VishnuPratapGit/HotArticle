@@ -6,6 +6,7 @@ import Button from "./Button";
 import Input from "./Input";
 import AuthWrapper from "./AuthWrapper";
 import MultiCategorySelector from "./MultiCategorySelector";
+import Article from "./Article";
 
 export {
   Category,
@@ -16,4 +17,5 @@ export {
   Button,
   AuthWrapper,
   MultiCategorySelector,
+  Article,
 };

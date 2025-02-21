@@ -16,6 +16,20 @@ type TokenPair = {
   refreshToken: string;
 };
 
+const signupSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  password: z.string().min(4, "Password must be at least 4 characters"),
+  categories: z
+    .array(
+      z
+        .string()
+        .toLowerCase()
+        .refine((s) => !s.includes(" "), "No Spaces!")
+    )
+    .nonempty("min one category required"),
+});
+
 const generateTokens = async (user: User): Promise<TokenPair> => {
   const accessToken = await sign(
     {
@@ -39,15 +53,6 @@ const generateTokens = async (user: User): Promise<TokenPair> => {
 
 const userSignup = async (c: Context) => {
   try {
-    const signupSchema = z.object({
-      name: z.string().min(1, "Name is required"),
-      email: z.string().email("Invalid email"),
-      password: z.string().min(4, "Password must be at least 4 characters"),
-      categories: z
-        .array(z.string())
-        .nonempty("At least one category is required"),
-    });
-
     const body = await c.req.json();
 
     const parsedData = signupSchema.safeParse(body);

@@ -1,12 +1,12 @@
 class DatabaseServices {
   constructor() {
     // ${import.meta.env.VITE_BACKEND_URL}
-    this.BASE_URL = `/api/v1/user`;
+    this.BASE_URL = `/api/v1`;
   }
 
   async getCurrentUser() {
     try {
-      const response = await fetch(`${this.BASE_URL}/getuser`, {
+      const response = await fetch(`${this.BASE_URL}/user/getuser`, {
         method: "GET",
         credentials: "include",
       });
@@ -27,7 +27,7 @@ class DatabaseServices {
 
   async login(inputData) {
     try {
-      const response = await fetch(`${this.BASE_URL}/login`, {
+      const response = await fetch(`${this.BASE_URL}/user/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -51,7 +51,7 @@ class DatabaseServices {
 
   async signup(inputData) {
     try {
-      const response = await fetch(`${this.BASE_URL}/signup`, {
+      const response = await fetch(`${this.BASE_URL}/user/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,7 +75,7 @@ class DatabaseServices {
 
   async logout() {
     try {
-      const response = await fetch(`${this.BASE_URL}/logout`, {
+      const response = await fetch(`${this.BASE_URL}/user/logout`, {
         method: "GET",
         credentials: "include",
       });
@@ -87,6 +87,24 @@ class DatabaseServices {
     } catch (error) {
       console.error("Logout failed:", error);
       return false;
+    }
+  }
+
+  async fetchArticles() {
+    try {
+      const response = await fetch(`${this.BASE_URL}/articles/get`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      const dataObj = await response.json();
+
+      if (!response.ok) return null;
+
+      return dataObj.data;
+    } catch (error) {
+      console.log("Failed to fetch articles");
+      return null;
     }
   }
 }
