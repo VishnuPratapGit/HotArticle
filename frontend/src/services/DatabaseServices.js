@@ -1,7 +1,6 @@
 class DatabaseServices {
   constructor() {
-    // ${import.meta.env.VITE_BACKEND_URL}
-    this.BASE_URL = `/api/v1`;
+    this.BASE_URL = `${import.meta.env.VITE_BACKEND_URL}/api/v1`;
   }
 
   async getCurrentUser() {
