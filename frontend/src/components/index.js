@@ -7,6 +7,7 @@ import Input from "./Input";
 import AuthWrapper from "./AuthWrapper";
 import MultiCategorySelector from "./MultiCategorySelector";
 import Article from "./Article";
+import Pagination from "./Pagination";
 
 export {
   Category,
@@ -18,4 +19,5 @@ export {
   AuthWrapper,
   MultiCategorySelector,
   Article,
+  Pagination,
 };

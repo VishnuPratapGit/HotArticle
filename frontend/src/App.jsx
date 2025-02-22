@@ -35,7 +35,7 @@ const App = () => {
       <nav className="sticky w-full top-0 z-50 border-b border-neutral-700 backdrop-blur-lg">
         <Navbar />
       </nav>
-      <div className="min-h-full">
+      <div className="min-h-full grow">
         <Outlet />
       </div>
     </div>

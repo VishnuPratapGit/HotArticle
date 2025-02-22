@@ -2,21 +2,22 @@ import { useEffect, useState } from "react";
 import databaseServices from "../services/DatabaseServices";
 import { useSelector, useDispatch } from "react-redux";
 import { saveArticles, removeArticles } from "../redux/articleSlice";
-import { Article } from "../components";
+import { Article, Pagination } from "../components";
 
 const Home = () => {
   const dispatch = useDispatch();
   const { status, data } = useSelector((state) => state.article);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    databaseServices.fetchArticles().then((data) => {
+    databaseServices.fetchArticles(page).then((data) => {
       if (data) {
         dispatch(saveArticles(data));
       } else {
         dispatch(removeArticles());
       }
     });
-  }, []);
+  }, [page]);
 
   if (status === false) {
     return (
@@ -27,10 +28,14 @@ const Home = () => {
   }
 
   return (
-    <div className="flex flex-wrap gap-5 mt-5">
-      {data?.map((article) => (
-        <Article key={article.id} cardData={article} />
-      ))}
+    <div>
+      <div className="flex flex-wrap gap-5 mt-5">
+        {data?.map((article) => (
+          <Article key={article.id} cardData={article} />
+        ))}
+      </div>
+
+      <Pagination page={page} setPage={setPage} length={data.length} />
     </div>
   );
 };

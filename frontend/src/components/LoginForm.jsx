@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Input, Button } from "./index.js";
 import databaseServices from "../services/DatabaseServices.js";
 import { useDispatch } from "react-redux";
@@ -11,7 +11,6 @@ const LoginForm = ({}) => {
     password: "",
   });
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const changeInputs = (e) => {

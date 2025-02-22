@@ -90,12 +90,15 @@ class DatabaseServices {
     }
   }
 
-  async fetchArticles() {
+  async fetchArticles(page = 1) {
     try {
-      const response = await fetch(`${this.BASE_URL}/articles/get`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${this.BASE_URL}/articles/get?page=${page}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       const dataObj = await response.json();
 
