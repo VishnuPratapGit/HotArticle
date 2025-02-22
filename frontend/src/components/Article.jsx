@@ -15,8 +15,8 @@ const Article = ({ cardData }) => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-neutral-900 rounded-lg shadow-lg hover:shadow-xl transition-colors duration-300 border border-neutral-700 hover:border-neutral-600">
+    <div className="max-w-2xl mx-auto my-5">
+      <div className="bg-neutral-900 sm:rounded-lg shadow-lg hover:shadow-xl transition-colors duration-300 border border-neutral-700 hover:border-neutral-600">
         <a
           href={cardData.link}
           target="_blank"

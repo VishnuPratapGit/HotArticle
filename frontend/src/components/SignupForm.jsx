@@ -7,8 +7,7 @@ import { login, logout } from "../redux/authSlice.js";
 import { useDispatch } from "react-redux";
 
 const SignupForm = ({}) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState([]);
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -16,6 +15,9 @@ const SignupForm = ({}) => {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const changeInputs = (e) => {
     const value = e.target.value;
@@ -27,27 +29,30 @@ const SignupForm = ({}) => {
 
   const nextStep = () => {
     if (!formData.name || !formData.email || !formData.password) return;
+    if (step === 2) return;
     setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const finalUserData = { ...formData, categories: selectedCategory };
 
     const isSignup = await databaseServices.signup(finalUserData);
     if (!isSignup) {
       alert("Registration failed!");
+      setLoading(false);
       return;
     }
 
-    alert("User registration successful");
+    alert("Registration Successful, Login Initiated");
 
     const { email, password } = formData;
 
     const isLogin = await databaseServices.login({ email, password });
     if (!isLogin) {
-      alert("Login failed. Redirecting to login page.");
+      alert("Login failed, Redirecting to login page.");
       return navigate("/login");
     }
 
@@ -59,6 +64,7 @@ const SignupForm = ({}) => {
       dispatch(logout());
     }
 
+    setLoading(false);
     setFormData({ name: "", email: "", password: "" });
   };
 
@@ -102,13 +108,19 @@ const SignupForm = ({}) => {
         {step === 2 && (
           <>
             <h2 className="sm:text-2xl text-center font-semibold mb-4">
-              Select Categories
+              {loading ? "Please Wait" : "Select Categories"}
             </h2>
+
             <MultiCategorySelector
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
             />
-            {selectedCategory.length > 0 && <Button type="submit" />}
+
+            <Button
+              heading="Submit"
+              type="submit"
+              disabled={selectedCategory.length === 0}
+            />
           </>
         )}
 

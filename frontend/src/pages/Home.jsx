@@ -29,7 +29,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="flex flex-wrap gap-5 mt-5">
+      <div className="mt-5">
         {data?.map((article) => (
           <Article key={article.id} cardData={article} />
         ))}

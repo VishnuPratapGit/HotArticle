@@ -106,7 +106,21 @@ class DatabaseServices {
 
       return dataObj.data;
     } catch (error) {
-      console.log("Failed to fetch articles");
+      console.log("Failed to fetch articles", error);
+      return null;
+    }
+  }
+
+  async getAllCategories() {
+    try {
+      const res = await fetch(`${this.BASE_URL}/articles//get-categories`);
+      const data = await res.json();
+
+      if (!res.ok) return null;
+
+      return data;
+    } catch (error) {
+      console.log("Faild to fetch all categories!", error);
       return null;
     }
   }

@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { login, logout } from "../redux/authSlice.js";
 
 const LoginForm = ({}) => {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -24,11 +25,13 @@ const LoginForm = ({}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     const isLogin = await databaseServices.login(formData);
 
     if (!isLogin) {
       alert("login failed");
+      setLoading(false);
       return;
     }
 
@@ -40,6 +43,8 @@ const LoginForm = ({}) => {
       dispatch(logout());
     }
 
+    setLoading(false);
+
     setFormData({
       email: "",
       password: "",
@@ -49,7 +54,9 @@ const LoginForm = ({}) => {
   return (
     <div className="rounded-lg border border-neutral-700 transition-colors duration-300 hover:border-neutral-500 p-8 max-w-md w-full">
       <form onSubmit={handleSubmit} className="space-y-5">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
+        <h1 className="text-2xl font-bold text-center">
+          {loading ? "Please Wait..." : "Login"}
+        </h1>
 
         <Input
           type="email"
@@ -69,7 +76,7 @@ const LoginForm = ({}) => {
           required
         />
 
-        <Button />
+        <Button heading="Submit" />
 
         <div className="text-center text-sm mt-4">
           Don't have a account ?{" "}
