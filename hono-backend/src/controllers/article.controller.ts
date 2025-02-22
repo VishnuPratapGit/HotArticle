@@ -112,4 +112,25 @@ const manageCategories = async (c: Context) => {
   }
 };
 
-export { fetchArticles, manageCategories, multipleCategories };
+const getAllCategories = async (c: Context) => {
+  try {
+    const allCategories = await db
+      .select({ id: categories.id, name: categories.name })
+      .from(categories);
+
+    if (allCategories.length === 0) {
+      return c.json({ error: "No Categories Found!" }, 404);
+    }
+    return c.json(allCategories, 200);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return c.json({ error: "Internal Server Error" }, 500);
+  }
+};
+
+export {
+  fetchArticles,
+  manageCategories,
+  multipleCategories,
+  getAllCategories,
+};
